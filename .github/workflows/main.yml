@@ -10,8 +10,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+        runner: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.runner }}
 
     steps:
     - uses: actions/checkout@v3
@@ -23,14 +23,14 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
-        name: catimg-${{ matrix.os }}
+        name: catimg-${{ runner.os }}
         path: bin/catimg
 
     - name: compress
       if: startsWith(github.ref, 'refs/tags/')
-      run: tar -czvf catimg-${{ matrix.os }}.tar.gz -C bin catimg
+      run: tar -czvf catimg-${{ runner.os }}.tar.gz -C bin catimg
     
     - uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: catimg-${{ matrix.os }}.tar.gz
+        files: catimg-${{ runner.os }}.tar.gz
