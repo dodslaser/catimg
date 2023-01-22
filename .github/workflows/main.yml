@@ -28,7 +28,7 @@ jobs:
 
     - name: compress
       if: startsWith(github.ref, 'refs/tags/')
-      run: tar -czvf catimg-${{ matrix.os }}.tar.gz bin/catimg
+      run: tar -czvf catimg-${{ matrix.os }}.tar.gz -C bin catimg
     
     - uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
