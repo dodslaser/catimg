@@ -1,0 +1,44 @@
+
+name: CI/CD
+
+on:
+  push:
+    branches: [master, cicd]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: compile
+      run: |
+        cmake .
+        make catimg
+        mv bin/catimg bin/catimg.${{ matrix.os }}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: catimg-${{ matrix.os }}
+        path: bin/catimg.${{ matrix.os }}
+  
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/download-artifact@v3
+      with:
+        path: artifacts
+    
+    - uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          artifacts/catimg-ubuntu-latest/catimg.ubuntu-latest
+          artifacts/catimg-macos-latest/catimg.macos-latest
+          
