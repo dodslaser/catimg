@@ -3,7 +3,6 @@ name: CI/CD
 
 on:
   push:
-    branches: master
     tags: ['**']
 
 jobs:
@@ -18,19 +17,20 @@ jobs:
     
     - name: compile
       run: |
+        echo KERNEL="$(uname)" >> $GITHUB_ENV
         cmake .
         make catimg
 
     - uses: actions/upload-artifact@v3
       with:
-        name: catimg-${{ runner.os }}
+        name: catimg-${{ env.KERNEL }}
         path: bin/catimg
 
     - name: compress
       if: startsWith(github.ref, 'refs/tags/')
-      run: tar -czvf catimg-${{ runner.os }}.tar.gz -C bin catimg
+      run: tar -czvf catimg-${{ env.KERNEL }}.tar.gz -C bin catimg
     
     - uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: catimg-${{ runner.os }}.tar.gz
+        files: catimg-${{ env.KERNEL }}.tar.gz
